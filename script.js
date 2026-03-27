@@ -26,23 +26,39 @@ async function connectMain(gamecode, address) {//executes after address form is 
     console.log(tempAddress);
     const rowCol= await fetchReq(tempAddress, null, "GET");
     console.log(rowCol);
+    flipCard(2,2, address, gamecode);
+}
+
+async function flipCard(rowNum, colNum, address, gamecode) {
+    tempAddress = address + "/flip/" + gamecode;
+    const card = {row:rowNum.toString(), 
+        col: colNum.toString()};
+    console.log(JSON.stringify(card));
+    const response = await fetchReq(tempAddress, card);
+    //console.log(response);
+    return response;
 }
 
 async function fetchReq(address, jsonToUse=null, requestType="POST") {
-    const response = await fetch(address,{
-    method:requestType,
-    // headers: {
-    //    "Content-Type": "application/json"
-    //}
-    //body: JSON.stringify(jsonToUse)
-    })
-    const data = await response.text();
+    //need to distinguish between get and post bc get 
+    //cannot have a body
+    let data, response;
+    if(requestType=="GET") {
+        response = await fetch(address,{
+        method:requestType,
+        })
+    }
+    else {
+        response = await fetch(address,{
+        method:requestType,
+        headers: {
+        "Content-Type": "application/json"
+    },
+        body: JSON.stringify(jsonToUse)
+        })
+        
+    }
+    data = await response.text();
     console.log(data);
     return data;
 }
-
-
-//const gamecode = fetchReq(serverID).then(value=>console.log(value));
-//replace console.log in above with some function that displays the board?
-
-//document.getElementById("output").innerHTML = data;//displaying the info
